@@ -27,34 +27,44 @@ if __name__ == '__main__':
     alpha_val = np.linspace(alpha_min, alpha_max,
                             window_num).reshape(window_num, 1)
 
-    policy = physbo.search.discrete.policy(test_X=alpha_val)
-    policy.set_seed(10)
-    policy.random_search(max_num_probes=1, simulator=simulator)
-    # policy.bayes_search(max_num_probes=10, simulator=simulator,
-    #                     score="EI", interval=1, num_rand_basis=500)
-    plot_area = st.empty()
-    fig = plt.figure()
-    ax = fig.add_subplot()
+    st.sidebar.title('')
+    Rand_Num = st.sidebar.number_input('ランダム探索：', 1, 100, 1)
+    Bayz_Num = st.sidebar.number_input('ベイズ最適化：', 1, 100, 5)
 
-    for i in range(5):
-        policy.bayes_search(max_num_probes=1, simulator=simulator, score="EI",
-                            interval=1, num_rand_basis=i)
-        ax.clear()
-        mean = policy.get_post_fmean(alpha_val)
-        var = policy.get_post_fcov(alpha_val)
-        std = np.sqrt(var)
-        x = alpha_val[:, 0]
-        ax.fill_between(x, (mean-std), (mean+std), color='b', alpha=.1)
-        ax.scatter(alpha_action, fx_action)
-        x1 = np.arange(0, 5, 0.01)
-        y1 = function(x1)
-        plt.plot(x1, y1, color='#ff4500')
-        # グラフを描画し直す
-        ax.plot(x, mean)
-        # プレースホルダに書き出す
-        plot_area.pyplot(fig)
-        time.sleep(3)
+    placeholder = st.empty()
 
-    # score = policy.get_score(mode="EI", xs=test_X)
-    best_fx, best_actions = policy.history.export_sequence_best_fx()
-    st.write(f"best_fx: {best_fx[-1]} at {alpha_val[best_actions[-1], :]}")
+    if st.button('Start'):
+        policy = physbo.search.discrete.policy(test_X=alpha_val)
+        policy.random_search(max_num_probes=Rand_Num, simulator=simulator)
+
+        plot_area = st.empty()
+        fig = plt.figure()
+        ax = fig.add_subplot()
+        best_fx, best_actions = policy.history.export_sequence_best_fx()
+        with placeholder:
+            st.write(
+                f"best_fx: {best_fx[-1]} at {alpha_val[best_actions[-1], :]}")
+
+        for i in range(Bayz_Num):
+            policy.bayes_search(max_num_probes=1, simulator=simulator,
+                                score="EI", interval=1, num_rand_basis=i)
+            ax.clear()
+            mean = policy.get_post_fmean(alpha_val)
+            var = policy.get_post_fcov(alpha_val)
+            std = np.sqrt(var)
+            x = alpha_val[:, 0]
+            ax.fill_between(x, (mean-std), (mean+std), color='b', alpha=.1)
+            ax.scatter(alpha_action, fx_action)
+            x1 = np.arange(0, 5, 0.01)
+            y1 = function(x1)
+            plt.plot(x1, y1, color='#ff4500')
+            ax.plot(x, mean)
+            plt.xlim([0, 5])
+            plt.ylim([-1.8, 1.5])
+
+            plot_area.pyplot(fig)
+            time.sleep(2)
+            best_fx, best_actions = policy.history.export_sequence_best_fx()
+            with placeholder:
+                st.write(
+                    f"best_fx: {best_fx[-1]} at {alpha_val[best_actions[-1], :]}")
