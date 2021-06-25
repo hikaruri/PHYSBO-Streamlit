@@ -4,13 +4,14 @@ from matplotlib import pyplot as plt
 import physbo
 import time
 
-# def function(x: float) -> float:
-#    return 0.1 * (2 * x - 1) * (x - 3) * (x - 5)
+
+def function(x: float) -> float:
+    return 0.1 * (2 * x - 1) * (x - 3) * (x - 5)
 
 
 def simulator(actions: int) -> float:
     x = alpha_val[actions][0]
-    fx = 0.1 * (2 * x - 1) * (x - 3) * (x - 5)
+    fx = function(x)
     alpha_action.append(x)
     fx_action.append(fx)
     return fx
@@ -46,7 +47,7 @@ if __name__ == '__main__':
         ax.fill_between(x, (mean-std), (mean+std), color='b', alpha=.1)
         ax.scatter(alpha_action, fx_action)
         x1 = np.arange(0, 5, 0.01)
-        y1 = 0.1 * (2 * x1 - 1) * (x1 - 3) * (x1 - 5)
+        y1 = function(x1)
         plt.plot(x1, y1, color='#ff4500')
         # グラフを描画し直す
         ax.plot(x, mean)

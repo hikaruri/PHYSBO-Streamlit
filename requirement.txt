@@ -1,0 +1,5 @@
+watchdog
+streamlit
+matplotlib
+watchdog
+click
