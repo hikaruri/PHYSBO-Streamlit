@@ -67,7 +67,7 @@ if __name__ == '__main__':
         for i in range(Bayz_Num):
             res = policy.bayes_search(max_num_probes=1, simulator=simulator,
                                       score="EI", interval=1,
-                                      num_rand_basis=int(time.time()))
+                                      num_rand_basis=500)
             ax.clear()
             mean = policy.get_post_fmean(alpha_val)
             var = policy.get_post_fcov(alpha_val)
