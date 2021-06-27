@@ -6,7 +6,6 @@ import time
 
 
 def function(One_Param_Func: str, x: float) -> float:
-    # fx = eval(One_Func_Param)
     fx = eval(One_Param_Func)
     return fx
 
@@ -14,16 +13,10 @@ def function(One_Param_Func: str, x: float) -> float:
 def simulator(actions: int) -> float:
     x = alpha_val[actions][0]
     fx = function(One_Param_Func, x)
-    alpha_action.append(x)
-    fx_action.append(fx)
     return fx
 
 
 if __name__ == '__main__':
-    # Make a set of candidates, test_X
-
-    alpha_action = []
-    fx_action = []
 
     st.title('PHYSBO Simulation')
     st.sidebar.title('Setting')
@@ -40,12 +33,11 @@ if __name__ == '__main__':
 
     alpha_val = np.linspace(alpha_min, alpha_max,
                             window_num).reshape(window_num, 1)
-
     plot_area = st.empty()
 
     fig = plt.figure()
     ax = fig.add_subplot()
-    x1 = np.arange(0, 5, 0.01)
+    x1 = np.arange(alpha_min, alpha_max, (alpha_max-alpha_min)/window_num)
     y1 = function(One_Param_Func, x1)
     plt.plot(x1, y1, color='#ff4500')
     plt.xlim([alpha_min, alpha_max])
@@ -55,33 +47,43 @@ if __name__ == '__main__':
     if st.sidebar.button('start'):
         placeholder = st.empty()
         policy = physbo.search.discrete.policy(test_X=alpha_val)
-        policy.set_seed( 0 )
-        policy.random_search(max_num_probes=Rand_Num, simulator=simulator)
+        policy.set_seed(0)
+        res = policy.random_search(max_num_probes=Rand_Num,
+                                   simulator=simulator)
         best_fx, best_actions = policy.history.export_sequence_best_fx()
         with placeholder:
             st.write(
                 f"best_fx: {best_fx[-1]} at {alpha_val[best_actions[-1], :]}")
-        ax.scatter(alpha_action, fx_action)
+        fx_action = [res.fx[i] for i in range(res.total_num_search)]
+        alpha_action_val = \
+            [alpha_val[res.chosen_actions[i]][0]
+                for i in range(res.total_num_search)]
+        ax.scatter(alpha_action_val, fx_action)
         plot_area.pyplot(fig)
 
         for i in range(Bayz_Num):
-            policy.bayes_search(max_num_probes=1, simulator=simulator,
-                                score="EI", interval=1, num_rand_basis=i)
+            res = policy.bayes_search(max_num_probes=1, simulator=simulator,
+                                      score="EI", interval=1, num_rand_basis=i)
             ax.clear()
             mean = policy.get_post_fmean(alpha_val)
             var = policy.get_post_fcov(alpha_val)
             std = np.sqrt(var)
             x = alpha_val[:, 0]
             ax.fill_between(x, (mean-std), (mean+std), color='b', alpha=.1)
-            ax.scatter(alpha_action, fx_action)
+            fx_action = [res.fx[i] for i in range(res.total_num_search)]
+            alpha_action_val = \
+                [alpha_val[res.chosen_actions[i]][0]
+                    for i in range(res.total_num_search)]
+            ax.scatter(alpha_action_val, fx_action)
             plt.plot(x1, y1, color='#ff4500')
             plt.xlim([alpha_min, alpha_max])
             plt.ylim([min(y1)-graph_mergin, max(y1)+graph_mergin])
             ax.plot(x, mean)
 
             plot_area.pyplot(fig)
-            time.sleep(2)
+            time.sleep(1)
             best_fx, best_actions = policy.history.export_sequence_best_fx()
             with placeholder:
                 st.write(
-                    f"best_fx: {best_fx[-1]} at {alpha_val[best_actions[-1], :]}")
+                    f"best_fx: {best_fx[-1]} at \
+                    {alpha_val[best_actions[-1], :]}")
