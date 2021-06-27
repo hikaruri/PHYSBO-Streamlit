@@ -1,0 +1,6 @@
+watchdog
+streamlit==0.83.0
+matplotlib
+watchdog
+click
+physbo
