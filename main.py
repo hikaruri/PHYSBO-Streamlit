@@ -5,15 +5,20 @@ import physbo
 import time
 import re
 
+import matheval
+
 
 def function(One_Param_Func: str, x: float) -> float:
-    # One_Param_Func is len < 30 and only include x
-    fx = eval(One_Param_Func) 
+    # One_Param_Func is len < 40
+    me = matheval.matheval()
+    fx = me.evaluate(One_Param_Func)
+    val_str = 'f('+str(x)+')'
+    fx = me.evaluate(val_str)
     return fx
 
 
 def simulator(actions: int) -> float:
-    x = alpha_val[actions][0]
+    x = float(alpha_val[actions][0])
     fx = function(One_Param_Func, x)
     return fx
 
@@ -26,14 +31,13 @@ if __name__ == '__main__':
     Func_Flag = True
     One_Param_Func = st.sidebar.text_input(
                     label='Function',
-                    value='0.1*(2*x-1)*(x-3)*(x-5)')
+                    value='f(x) = sin(3x)+sin(x)-0.1x')
 
-    Func_Flag = not(bool(re.search(r'[a-wyzA-WYZ]', One_Param_Func)))
-    if len(One_Param_Func) > 30:
+    if len(One_Param_Func) > 50:
         Func_Flag = False
     
     if not Func_Flag:
-        st.warning('You can only use the parameter x')
+        st.warning('Fx is Too long')
 
     
     Rand_Num = st.sidebar.number_input('Random Search Num：', 1, 20, 5)
@@ -47,14 +51,14 @@ if __name__ == '__main__':
     alpha_val = np.linspace(alpha_min, alpha_max,
                             window_num).reshape(window_num, 1)
 
-
     plot_area = st.empty()
     fig = plt.figure()
     ax = fig.add_subplot()
     x1 = np.arange(alpha_min, alpha_max, (alpha_max-alpha_min)/window_num)
-    
+    x1 = x1.tolist()
+
     if Func_Flag:
-        y1 = function(One_Param_Func, x1)
+        y1 = [function(One_Param_Func, x1[i]) for i in range(int(len(x1)))]
         plt.plot(x1, y1, color='#ff4500')
         plt.xlim([alpha_min, alpha_max])
         plt.ylim([min(y1)-graph_mergin, max(y1)+graph_mergin])
