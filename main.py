@@ -23,8 +23,8 @@ if __name__ == '__main__':
     One_Param_Func = st.sidebar.text_input(
                     label='Function',
                     value='np.sin(3 * x) + np.sin(x) - 0.1 * x')
-    Rand_Num = st.sidebar.number_input('Random Search Num：', 1, 100, 2)
-    Bayz_Num = st.sidebar.number_input('Bayesian Opt. Num：', 1, 100, 20)
+    Rand_Num = st.sidebar.number_input('Random Search Num：', 1, 100, 5)
+    Bayz_Num = st.sidebar.number_input('Bayesian Opt. Num：', 1, 100, 10)
 
     window_num = st.sidebar.number_input('X_Window Num：', 10001)
     alpha_min = st.sidebar.number_input('Xmin：', -100.0, 100.0, 0.0)
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         for i in range(Bayz_Num):
             res = policy.bayes_search(max_num_probes=1, simulator=simulator,
                                       score="EI", interval=1,
-                                      num_rand_basis=500)
+                                      num_rand_basis=100)
             ax.clear()
             mean = policy.get_post_fmean(alpha_val)
             var = policy.get_post_fcov(alpha_val)

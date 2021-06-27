@@ -1,6 +1,0 @@
-watchdog
-streamlit
-matplotlib
-watchdog
-click
-physbo
