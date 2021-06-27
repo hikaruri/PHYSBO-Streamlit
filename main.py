@@ -33,8 +33,8 @@ if __name__ == '__main__':
 
     alpha_val = np.linspace(alpha_min, alpha_max,
                             window_num).reshape(window_num, 1)
-    plot_area = st.empty()
 
+    plot_area = st.empty()
     fig = plt.figure()
     ax = fig.add_subplot()
     x1 = np.arange(alpha_min, alpha_max, (alpha_max-alpha_min)/window_num)
@@ -47,23 +47,27 @@ if __name__ == '__main__':
     if st.sidebar.button('start'):
         placeholder = st.empty()
         policy = physbo.search.discrete.policy(test_X=alpha_val)
-        policy.set_seed(0)
+        policy.set_seed(int(time.time()))
         res = policy.random_search(max_num_probes=Rand_Num,
                                    simulator=simulator)
+
         best_fx, best_actions = policy.history.export_sequence_best_fx()
         with placeholder:
             st.write(
                 f"best_fx: {best_fx[-1]} at {alpha_val[best_actions[-1], :]}")
+
         fx_action = [res.fx[i] for i in range(res.total_num_search)]
         alpha_action_val = \
             [alpha_val[res.chosen_actions[i]][0]
                 for i in range(res.total_num_search)]
         ax.scatter(alpha_action_val, fx_action)
+
         plot_area.pyplot(fig)
 
         for i in range(Bayz_Num):
             res = policy.bayes_search(max_num_probes=1, simulator=simulator,
-                                      score="EI", interval=1, num_rand_basis=i)
+                                      score="EI", interval=1,
+                                      num_rand_basis=int(time.time()))
             ax.clear()
             mean = policy.get_post_fmean(alpha_val)
             var = policy.get_post_fcov(alpha_val)
