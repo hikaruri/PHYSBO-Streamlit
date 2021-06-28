@@ -1,5 +1,9 @@
 # PHYSBO-Streamlit
 Web app. of the Bayesian optimization
+
+# DEMO on heroku
+[physbo-streamlit.herokuapp](https://physbo-streamlit.herokuapp.com/)
+
 # Requirement
 ```
 watchdog
