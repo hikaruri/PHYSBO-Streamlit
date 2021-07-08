@@ -1,7 +1,8 @@
 # PHYSBO-Streamlit
 Web app. of the Bayesian optimization
 
-# DEMO on heroku
+# DEMO
+[share.streamlit](https://share.streamlit.io/hikaruri/physbo-streamlit/main/main.py)
 [physbo-streamlit.herokuapp](https://physbo-streamlit.herokuapp.com/)
 
 # Requirement
